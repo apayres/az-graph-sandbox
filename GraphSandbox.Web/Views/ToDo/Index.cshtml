@@ -1,0 +1,65 @@
+﻿@model GraphSandbox.Web.Models.ToDoModel
+@{
+    ViewData["Title"] = "To Do";
+}
+
+@using (Html.BeginForm("Index", "ToDo", null, FormMethod.Post))
+{
+    <div class="row mt-5 justify-content-center">
+        <div class="col-4">
+            <ul class="list-group">
+                @foreach (var item in Model.TaskLists)
+                {
+                    var active = !string.IsNullOrWhiteSpace(Model.SelectedTaskListID) && Model.SelectedTaskListID == item.Key;
+                    @Html.ActionLink(item.Value, "Index", "ToDo", new { id = item.Key }, new { @class = "list-group-item list-group-item-action " + (active ? "active" : "") })
+                }
+            </ul>
+        </div>
+        <div class="col-4">
+            @if (Model.Tasks != null)
+            {
+                @foreach (var item in Model.Tasks.OrderBy(x => x.Completed))
+                {
+                    <div class="input-group mb-3">
+                        <div class="input-group-text">
+                            @if (item.Completed)
+                            {
+                                <input class="form-check-input mt-0" type="checkbox" value="" checked onchange="updateTaskStatus('@Model.SelectedTaskListID', '@item.Id', this)">
+                            }
+                            else
+                            {
+                                <input class="form-check-input mt-0" type="checkbox" value="" onchange="updateTaskStatus('@Model.SelectedTaskListID', '@item.Id', this)">
+                            }
+
+                        </div>
+                        <input type="text" class="form-control" value="@item.Title" readonly>
+                    </div>
+                }
+                
+                <div class="input-group">
+                    @Html.HiddenFor(m => m.SelectedTaskListID)
+                    @Html.TextBoxFor(m => m.ToDoItem, new { @class = "form-control", placeholder="New Task..." })
+                    <input type="submit" class="btn btn-primary" value="Add" />
+                </div>
+            }
+        </div>
+    </div>
+}
+
+<script>
+    function updateTaskStatus(taskListID, taskID, el) {
+        var complete = $(el).is(':checked');
+
+        $.post(
+            '/ToDo/UpdateTaskStatus',
+            {
+                taskListID,
+                taskID,
+                complete
+            },
+            function (data, status) {
+                console.log(status);
+            }
+        );
+    }
+</script>

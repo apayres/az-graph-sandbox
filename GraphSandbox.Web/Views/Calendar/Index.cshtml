@@ -1,0 +1,69 @@
+﻿@model GraphSandbox.Web.Models.CalendarModel
+@{
+    ViewData["Title"] = "Calendar Events";
+}
+
+@using (Html.BeginForm("Index", "Calendar", null, FormMethod.Post))
+{
+    <div class="row mt-5 justify-content-center">
+        <div class="col-4">
+            <div class="mb-1">
+                <span class="form-label">Upcoming Events</span>
+            </div>
+            <ul class="list-group">
+                @if (Model.Events != null)
+                {
+                    foreach (var item in Model.Events)
+                    {
+                        var active = !string.IsNullOrWhiteSpace(Model.TargetEvent.Id) && Model.TargetEvent.Id == item.Id;
+                        var linkTitle = $"{item.Title} ({item.StartDateTime.Value.ToString("MMM, d")})";
+                        @Html.ActionLink(linkTitle, "Index", "Calendar", new { id = item.Id }, new { @class = "list-group-item list-group-item-action " + (active ? "active" : "") })
+                    }
+                }
+            </ul>
+        </div>
+        <div class="col-4">
+            <div class="mb-3">
+                <span class="form-label">Event Title</span>
+                @Html.TextBoxFor(m => m.TargetEvent.Title, new { @class = "form-control" })
+            </div>
+
+            <div class="mb-3">
+                <span class="form-label">Start Date</span>
+                @Html.TextBoxFor(m => m.TargetEvent.StartDateTime, new { @class = "form-control" })
+            </div>
+
+            <div class="mb-3">
+                <span class="form-label">End Date</span>
+                @Html.TextBoxFor(m => m.TargetEvent.EndDateTime, new { @class = "form-control" })
+            </div>
+
+            @Html.HiddenFor(m => m.TargetEvent.Id)
+            <input type="submit" class="btn btn-primary" value="@(string.IsNullOrWhiteSpace(Model.TargetEvent.Id) ? "Add" : "Save")" />
+
+            @if (!string.IsNullOrWhiteSpace(Model.TargetEvent.Id))
+            {
+                <input type="button" class="btn btn-danger" value="Delete" onclick="deleteEvent('@Model.TargetEvent.Id')" />
+            }
+
+            @Html.ActionLink("Clear", "Index", "Calendar", new { id = string.Empty }, new { id="resetForm", @class = "btn btn-secondary" })
+        </div>
+    </div>
+}
+
+<script>
+    function deleteEvent(id) {
+
+        $.post(
+            '/Calendar/DeleteEvent',
+            {
+                id
+            },
+            function (data, status) {
+                console.log(status);
+            }
+        );
+
+        return false;
+    }
+</script>

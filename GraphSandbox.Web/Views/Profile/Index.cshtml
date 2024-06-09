@@ -1,0 +1,25 @@
+﻿@model GraphSandbox.Web.Models.ProfileModel
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<div class="row mt-5 justify-content-center">
+    <div class="col-4">
+        <img src="data:image;base64,@Model.PhotoData" style="width: 100%;" />
+    </div>
+    <div class="col-4">
+        <div class="mb-3">
+            <div class="form-label">First Name</div>
+            @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control", disabled = true })
+        </div>
+
+        <div class="mb-3">
+            <div class="form-label">Last Name</div>
+            @Html.TextBoxFor(m => m.LastName, new { @class = "form-control", disabled = true })
+        </div>
+        <div class="mb-3">
+            <div class="form-label">Email</div>
+            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", disabled = true })
+        </div>
+    </div>
+</div>
